@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,6 +34,66 @@
       background-color: #f00;
       width: 0%;
     }
+    .login-form {
+      margin-top: 10px;
+    }
+    .login-form input {
+      margin-bottom: 5px;
+    }
+    .login-form button {
+      margin-top: 5px;
+    }
+    .user-status {
+      margin-top: 10px;
+    }
+    .user-status span {
+      font-weight: bold;
+    }
+    .favorite-videos {
+      margin-top: 10px;
+    }
+    .favorite-videos ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .favorite-videos li {
+      margin-bottom: 5px;
+    }
+    .recommended-channels {
+      margin-top: 10px;
+    }
+    .recommended-channels ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .recommended-channels li {
+      margin-bottom: 5px;
+    }
+    .interactions {
+      margin-top: 10px;
+    }
+    .interactions button {
+      margin-right: 5px;
+    }
+    .search-form {
+      margin-top: 10px;
+    }
+    .search-form input {
+      margin-right: 5px;
+    }
+    .search-form button {
+      margin-top: 5px;
+    }
+    .search-results {
+      margin-top: 10px;
+    }
+    .search-results ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    .search-results li {
+      margin-bottom: 5px;
+    }
   </style>
 </head>
 <body>
@@ -48,6 +109,43 @@
     <div class="progress"></div>
   </div>
 
+  <div class="login-form">
+    <input type="text" id="username" placeholder="用户名">
+    <input type="password" id="password" placeholder="密码">
+    <button onclick="login()">登录</button>
+  </div>
+
+  <div class="user-status">
+    <span id="userStatus"></span>
+  </div>
+
+  <div class="favorite-videos">
+    <h3>收藏视频</h3>
+    <ul id="favoriteVideos"></ul>
+  </div>
+
+  <div class="recommended-channels">
+    <h3>推荐频道</h3>
+    <ul id="recommendedChannels"></ul>
+  </div>
+
+  <div class="interactions">
+    <button onclick="like()">点赞</button>
+    <span id="likeCount">0</span>
+    <button onclick="share()">分享</button>
+    <button onclick="follow()">关注</button>
+  </div>
+
+  <div class="search-form">
+    <input type="text" id="searchKeyword" placeholder="关键词">
+    <button onclick="search()">搜索</button>
+  </div>
+
+  <div class="search-results">
+    <h3>搜索结果</h3>
+    <ul id="searchResults"></ul>
+  </div>
+
   <script>
     // JavaScript代码
     var videoPlayer = document.getElementById('videoPlayer');
@@ -59,6 +157,15 @@
       '其他': ['video7.mp4', 'video8.mp4', 'video9.mp4']
     };
     var currentVideoIndex = 0;
+
+    var users = [
+      { username: 'user1', password: 'password1', favoriteVideos: [], interests: ['热门视频'] },
+      { username: 'user2', password: 'password2', favoriteVideos: [], interests: ['体育频道'] }
+    ];
+
+    var currentUser = null;
+
+    var likeCount = 0;
 
     function changeCategory(category) {
       currentCategory = category;
@@ -77,6 +184,95 @@
       var clickPosition = event.clientX - progressBar.getBoundingClientRect().left;
       var seekTime = (clickPosition / progressBarWidth) * videoPlayer.duration;
       videoPlayer.currentTime = seekTime;
+    }
+
+    function login() {
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].username === username && users[i].password === password) {
+          currentUser = users[i];
+          document.getElementById('userStatus').textContent = '已登录，用户名：' + currentUser.username;
+          displayFavoriteVideos();
+          displayRecommendedChannels();
+          break;
+        }
+      }
+    }
+
+    function addToFavorites() {
+      if (currentUser) {
+        var videoUrl = videosByCategory[currentCategory][currentVideoIndex];
+        currentUser.favoriteVideos.push(videoUrl);
+        displayFavoriteVideos();
+      }
+    }
+
+    function displayFavoriteVideos() {
+      var favoriteVideosElement = document.getElementById('favoriteVideos');
+      favoriteVideosElement.innerHTML = '';
+
+      if (currentUser && currentUser.favoriteVideos.length > 0) {
+        for (var i = 0; i < currentUser.favoriteVideos.length; i++) {
+          var li = document.createElement('li');
+          li.textContent = currentUser.favoriteVideos[i];
+          favoriteVideosElement.appendChild(li);
+        }
+      } else {
+        var li = document.createElement('li');
+        li.textContent = '暂无收藏视频';
+        favoriteVideosElement.appendChild(li);
+      }
+    }
+
+    function displayRecommendedChannels() {
+      var recommendedChannelsElement = document.getElementById('recommendedChannels');
+      recommendedChannelsElement.innerHTML = '';
+
+      if (currentUser && currentUser.interests.length > 0) {
+        for (var i = 0; i < currentUser.interests.length; i++) {
+          var li = document.createElement('li');
+          li.textContent = currentUser.interests[i];
+          recommendedChannelsElement.appendChild(li);
+        }
+      } else {
+        var li = document.createElement('li');
+        li.textContent = '暂无推荐频道';
+        recommendedChannelsElement.appendChild(li);
+      }
+    }
+
+    function like() {
+      likeCount++;
+      document.getElementById('likeCount').textContent = likeCount;
+    }
+
+    function share() {
+      // 弹出分享选项供用户选择分享方式
+      alert('选择分享方式');
+    }
+
+    function follow() {
+      // 将当前频道或用户添加到关注列表中
+      alert('关注成功');
+    }
+
+    function search() {
+      var keyword = document.getElementById('searchKeyword').value;
+      var searchResultsElement = document.getElementById('searchResults');
+      searchResultsElement.innerHTML = '';
+
+      for (var category in videosByCategory) {
+        for (var i = 0; i < videosByCategory[category].length; i++) {
+          var videoUrl = videosByCategory[category][i];
+          if (videoUrl.includes(keyword)) {
+            var li = document.createElement('li');
+            li.textContent = videoUrl;
+            searchResultsElement.appendChild(li);
+          }
+        }
+      }
     }
 
     document.addEventListener('keydown', function(event) {
@@ -103,11 +299,3 @@
         videoPlayer.currentTime += 5;
       }
     });
-
-    videoPlayer.addEventListener('timeupdate', function() {
-      var progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
-      progressBar.style.width = progress + '%';
-    });
-  </script>
-</body>
-</html>
