@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>网页短视频应用</title>
+  <style>
+    /* CSS样式 */
+    .video-container {
+      width: 640px;
+      height: 360px;
+      position: relative;
+      overflow: hidden;
+    }
+    .video-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .category-buttons {
+      margin-top: 10px;
+    }
+    .category-buttons button {
+      margin-right: 5px;
+    }
+    .progress-bar {
+      width: 100%;
+      height: 10px;
+      background-color: #ccc;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .progress-bar .progress {
+      height: 100%;
+      background-color: #f00;
+      width: 0%;
+    }
+  </style>
+</head>
+<body>
+  <div class="video-container">
+    <video id="videoPlayer" src="" controls></video>
+  </div>
+  <div class="category-buttons">
+    <button onclick="changeCategory('热门视频')">热门视频</button>
+    <button onclick="changeCategory('体育频道')">体育频道</button>
+    <button onclick="changeCategory('其他')">其他</button>
+  </div>
+  <div class="progress-bar" onclick="seekVideo(event)">
+    <div class="progress"></div>
+  </div>
+
+  <script>
+    // JavaScript代码
+    var videoPlayer = document.getElementById('videoPlayer');
+    var progressBar = document.querySelector('.progress-bar .progress');
+    var currentCategory = '热门视频';
+    var videosByCategory = {
+      '热门视频': ['video1.mp4', 'video2.mp4', 'video3.mp4'],
+      '体育频道': ['video4.mp4', 'video5.mp4', 'video6.mp4'],
+      '其他': ['video7.mp4', 'video8.mp4', 'video9.mp4']
+    };
+    var currentVideoIndex = 0;
+
+    function changeCategory(category) {
+      currentCategory = category;
+      currentVideoIndex = 0;
+      changeVideo(videosByCategory[currentCategory][currentVideoIndex]);
+    }
+
+    function changeVideo(videoUrl) {
+      videoPlayer.src = videoUrl;
+      videoPlayer.load();
+      videoPlayer.play();
+    }
+
+    function seekVideo(event) {
+      var progressBarWidth = progressBar.offsetWidth;
+      var clickPosition = event.clientX - progressBar.getBoundingClientRect().left;
+      var seekTime = (clickPosition / progressBarWidth) * videoPlayer.duration;
+      videoPlayer.currentTime = seekTime;
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.keyCode === 38) { // 上键
+        event.preventDefault();
+        currentVideoIndex = (currentVideoIndex - 1 + videosByCategory[currentCategory].length) % videosByCategory[currentCategory].length;
+        changeVideo(videosByCategory[currentCategory][currentVideoIndex]);
+      } else if (event.keyCode === 40) { // 下键
+        event.preventDefault();
+        currentVideoIndex = (currentVideoIndex + 1) % videosByCategory[currentCategory].length;
+        changeVideo(videosByCategory[currentCategory][currentVideoIndex]);
+      } else if (event.keyCode === 32) { // 空格键
+        event.preventDefault();
+        if (videoPlayer.paused) {
+          videoPlayer.play();
+        } else {
+          videoPlayer.pause();
+        }
+      } else if (event.keyCode === 37) { // 左键
+        event.preventDefault();
+        videoPlayer.currentTime -= 5;
+      } else if (event.keyCode === 39) { // 右键
+        event.preventDefault();
+        videoPlayer.currentTime += 5;
+      }
+    });
+
+    videoPlayer.addEventListener('timeupdate', function() {
+      var progress = (videoPlayer.currentTime / videoPlayer.duration) * 100;
+      progressBar.style.width = progress + '%';
+    });
+  </script>
+</body>
+</html>
